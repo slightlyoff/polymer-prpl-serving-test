@@ -6,10 +6,33 @@ handlers:
 
 - url: /bower_components
   static_dir: bower_components
+  secure: always
 
 - url: /manifest.json
   static_files: manifest.json
   upload: manifest.json
+  secure: always
+
+- url: /service-worker.js
+  static_files: service-worker.js
+  upload: service-worker.js
+  secure: always
 
 - url: /.*
   script: main.app
+  secure: always
+
+skip_files:
+- ^(.*/)?app\.yaml
+- ^(.*/)?app\.yml
+- ^(.*/)?index\.yaml
+- ^(.*/)?index\.yml
+- ^(.*/)?bower\.json
+- ^(.*/)?#.*#
+- ^(.*/)?.*~
+- ^(.*/)?.*\.py[co]
+- ^(.*/)?.*/RCS/.*
+- ^(.*/)?\..*
+- ^(.*/)?.*\.bak$
+- ^(.*/)?node_modules/.*
+- ^.*.md|markdown
