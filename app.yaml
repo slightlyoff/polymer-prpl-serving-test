@@ -3,5 +3,13 @@ api_version: 1
 threadsafe: true
 
 handlers:
+
+- url: /bower_components
+  static_dir: bower_components
+
+- url: /manifest.json
+  static_files: manifest.json
+  upload: manifest.json
+
 - url: /.*
   script: main.app
