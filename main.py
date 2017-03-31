@@ -27,7 +27,6 @@ class MainHandler(http2.PushHandler):
     path = os.path.join(os.path.dirname(__file__), 'build/default/index.html')
     return self.response.write(template.render(path, {}))
 
-
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/view1', MainHandler),

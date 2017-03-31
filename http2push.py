@@ -146,13 +146,9 @@ Example:
  def get(self):
    pass
 
- @http2push.push('push_manifest.json', 'shell.html') # Override default path
- def get(self):
-   pass
-
 ?nopush on the URL prevents the header from being included.
 """
-def push(manifest=PUSH_MANIFEST, default=DEFAULT_PATH):
+def push(manifest=PUSH_MANIFEST):
   def decorator(handler):
     push_urls = use_push_manifest(manifest)
     is_single_file_manifest = False
@@ -173,14 +169,13 @@ def push(manifest=PUSH_MANIFEST, default=DEFAULT_PATH):
             path = path[1:]
 
           if not push_urls.has_key(path):
-            path = default
+            path = DEFAULT_PATH
 
           # Bail out if we don't have an entry for the path
           if not push_urls.has_key(path):
             return handler(*args, **kwargs)
 
           request_push_urls = push_urls[path]
-          logging.info(request_push_urls)
 
         preload_headers = instance._generate_link_preload_headers(request_push_urls)
         if type(preload_headers) is list:

@@ -4,16 +4,16 @@ threadsafe: true
 
 handlers:
 
-- url: /bower_components
-  static_dir: build/default/bower_components
+- url: /bower_components/
+  static_dir: bower_components/
   secure: always
 
-- url: /src
-  static_dir: build/default/src
+- url: /src/
+  static_dir: build/default/src/
   secure: always
 
 - url: /images
-  static_dir: build/default/images
+  static_dir: build/default/images/
   secure: always
 
 - url: /manifest.json
