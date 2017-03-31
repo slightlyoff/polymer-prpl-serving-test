@@ -97,7 +97,7 @@ class PushHandler(webapp2.RequestHandler):
 
     headers = list(set(associate_content)) # remove duplicates
 
-    return ','.join(headers)
+    return ', '.join(headers)
 
   def _generate_link_preload_headers(self, urls=None):
     """Constructs a value for the Link: rel=preload header.
@@ -133,7 +133,7 @@ class PushHandler(webapp2.RequestHandler):
     headers = list(set(preload_links)) # remove duplicates
 
     # GAE supports single Link header.
-    return ','.join(headers)
+    return ', '.join(headers)
 
 """
 Example:
@@ -188,6 +188,13 @@ def push(manifest=PUSH_MANIFEST, default=DEFAULT_PATH):
             instance.response.headers.add_header('Link', h)
         else:
           instance.response.headers.add_header('Link', preload_headers)
+
+        xac_headers = instance._generate_associate_content_header(request_push_urls)
+        if type(xac_headers) is list:
+          for h in xac_headers:
+            instance.response.headers.add_header('X-Associated-Content', h)
+        else:
+          instance.response.headers.add_header('X-Associated-Content', xac_headers)
 
       return handler(*args, **kwargs)
 
