@@ -44,13 +44,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <meta name="msapplication-tap-highlight" content="no">
 
     <!-- Load and register pre-caching Service Worker -->
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-          navigator.serviceWorker.register('/service-worker.js');
-        });
-      }
-    </script>
+    <script>'serviceWorker'in navigator&&window.addEventListener('load',function(){navigator.serviceWorker.register('/service-worker.js')});</script>
 
     <!-- Load webcomponents-loader.js to check and load any polyfills your browser needs -->
     <script src="/bower_components/webcomponentsjs/webcomponents-loader.js"></script>
@@ -59,15 +53,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <link rel="import" href="/src/my-app.html">
 
     <!-- Add any global styles for body, document, etc. -->
-    <style>
-      body {
-        margin: 0;
-        font-family: 'Roboto', 'Noto', sans-serif;
-        line-height: 1.5;
-        min-height: 100vh;
-        background-color: #eeeeee;
-      }
-    </style>
+    <style>body{margin:0;font-family:'Roboto', 'Noto', sans-serif;line-height:1.5;min-height:100vh;background-color:#eeeeee;}</style>
   </head>
   <body>
     <my-app></my-app>
