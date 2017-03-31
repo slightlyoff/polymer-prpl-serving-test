@@ -22,44 +22,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 </head><body><dom-module id="my-app">
   <template>
-    <style>
-      :host {
-        --app-primary-color: #4285f4;
-        --app-secondary-color: black;
-
-        display: block;
-      }
-
-      app-drawer-layout:not([narrow]) [drawer-toggle] {
-        display: none;
-      }
-
-      app-header {
-        color: #fff;
-        background-color: var(--app-primary-color);
-      }
-
-      app-header paper-icon-button {
-        --paper-icon-button-ink-color: white;
-      }
-
-      .drawer-list {
-        margin: 0 20px;
-      }
-
-      .drawer-list a {
-        display: block;
-        padding: 0 16px;
-        text-decoration: none;
-        color: var(--app-secondary-color);
-        line-height: 40px;
-      }
-
-      .drawer-list a.iron-selected {
-        color: black;
-        font-weight: bold;
-      }
-    </style>
+    <style>:host{--app-primary-color:#4285f4;--app-secondary-color:black;display:block;}app-drawer-layout:not([narrow]) [drawer-toggle]{display:none;}app-header{color:#fff;background-color:var(--app-primary-color);}app-header paper-icon-button{--paper-icon-button-ink-color:white;}.drawer-list{margin:0 20px;}.drawer-list a{display:block;padding:0 16px;text-decoration:none;color:var(--app-secondary-color);line-height:40px;}.drawer-list a.iron-selected{color:black;font-weight:bold;}</style>
 
     <app-location route="{{route}}"></app-location>
     <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
@@ -95,60 +58,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </app-drawer-layout>
   </template>
 
-  <script>
-    class MyApp extends Polymer.Element {
-
-      static get is() { return 'my-app'; }
-
-      static get properties() {
-        return {
-          page: {
-            type: String,
-            reflectToAttribute: true,
-            observer: '_pageChanged',
-          },
-        };
-      }
-
-      static get observers() {
-        return [
-          '_routePageChanged(routeData.page)',
-        ];
-      }
-
-      _routePageChanged(page) {
-        // Polymer 2.0 will call with `undefined` on initialization.
-        // Ignore until we are properly called with a string.
-        if (page === undefined) {
-          return;
-        }
-
-        // If no page was found in the route data, page will be an empty string.
-        // Deault to 'view1' in that case.
-        this.page = page || 'view1';
-
-        // Close a non-persistent drawer when the page & route are changed.
-        if (!this.$.drawer.persistent) {
-          this.$.drawer.close();
-        }
-      }
-
-      _pageChanged(page) {
-        // Load page import on demand. Show 404 page if fails
-        var resolvedPageUrl = this.resolveUrl('my-' + page + '.html');
-        Polymer.importHref(
-            resolvedPageUrl,
-            null,
-            this._showPage404.bind(this),
-            true);
-      }
-
-      _showPage404() {
-        this.page = 'view404';
-      }
-    }
-
-    window.customElements.define(MyApp.is, MyApp);
-  </script>
+  <script>class MyApp extends Polymer.Element{static get is(){return'my-app'}static get properties(){return{page:{type:String,reflectToAttribute:!0,observer:'_pageChanged'}}}static get observers(){return['_routePageChanged(routeData.page)']}_routePageChanged(a){void 0===a||(this.page=a||'view1',!this.$.drawer.persistent&&this.$.drawer.close())}_pageChanged(a){var b=this.resolveUrl('my-'+a+'.html');Polymer.importHref(b,null,this._showPage404.bind(this),!0)}_showPage404(){this.page='view404'}}window.customElements.define(MyApp.is,MyApp);</script>
 </dom-module>
 </body></html>

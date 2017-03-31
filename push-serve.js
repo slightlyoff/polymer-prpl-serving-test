@@ -5,8 +5,8 @@ const path = require("path");
 const debug = require("debug")("http2push");
 const log = debug;
 const err = (...args) => { debug("Error:", ...args); };
+const compression = require("compression");
 const express = require("express");
-const app = express();
 const http2push = require("./http2push.js");
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -14,8 +14,15 @@ const http2push = require("./http2push.js");
 //  Server Setup
 //
 ///////////////////////////////////////////////////////////////////////////////
-
 const STATIC_DIR = "./build/default";
+
+const app = express();
+app.use(compression());
+
+// Hack while I figure out how to trim manifest output
+app.use("/bower_components", express.static(STATIC_DIR + "/bower_components"));
+app.use("/images", express.static(STATIC_DIR + "/images"));
+app.use("/src", express.static(STATIC_DIR + "/src"));
 
 // Use the built-in express middleware for serving static files from './static'
 // Configure the push system to send headers for those paths

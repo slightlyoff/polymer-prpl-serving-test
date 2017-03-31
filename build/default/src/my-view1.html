@@ -11,13 +11,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 </head><body><dom-module id="my-view1">
   <template>
-    <style include="shared-styles">
-      :host {
-        display: block;
-
-        padding: 10px;
-      }
-    </style>
+    <style include="shared-styles">:host{display:block;padding:10px;}</style>
 
     <div class="card">
       <div class="circle">1</div>
@@ -27,12 +21,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </div>
   </template>
 
-  <script>
-    class MyView1 extends Polymer.Element {
-      static get is() { return 'my-view1'; }
-    }
-
-    window.customElements.define(MyView1.is, MyView1);
-  </script>
+  <script>class MyView1 extends Polymer.Element{static get is(){return'my-view1'}}window.customElements.define(MyView1.is,MyView1);</script>
 </dom-module>
 </body></html>

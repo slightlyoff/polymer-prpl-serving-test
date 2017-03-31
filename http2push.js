@@ -34,7 +34,8 @@ const getLinkHeaderValue = (path, pushDataMap) => {
   let items = [];
   let files = pushDataMap.get(path);
   for (let f of Object.keys(files)) {
-    if (files[f].hasOwnProperty("type")) {
+    let type = files[f].type;
+    if (type !== undefined && type != "document") {
       items.push(`<${f}>; rel=preload; as=${files[f].type}`);
     } else {
       items.push(`<${f}>; rel=preload`);
@@ -103,10 +104,6 @@ module.exports = function(options) {
         item.hasOwnProperty("type") && item.hasOwnProperty("weight")
       )
     ) {
-      err("http2push middleware expects multi-file manifests, got a single-file manifest instead");
-      err("pushing identical resources for all requests");
-      log("file:", file);
-      log("item:", item);
       isSingleFileManifest = true;
     }
     break;
