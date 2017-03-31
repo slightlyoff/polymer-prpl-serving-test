@@ -5,7 +5,7 @@ threadsafe: true
 handlers:
 
 - url: /bower_components/
-  static_dir: bower_components/
+  static_dir: build/default/bower_components/
   secure: always
 
 - url: /src/

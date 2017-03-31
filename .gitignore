@@ -2,3 +2,4 @@ bower_components/
 node_modules/
 npm-debug.log
 *.pyc
+!build/default/bower_components/
