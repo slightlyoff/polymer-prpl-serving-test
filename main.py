@@ -12,15 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+import sys
 import webapp2
 
+from google.appengine.ext.webapp import template
 
-class MainPage(webapp2.RequestHandler):
-    def get(self):
-        self.response.headers['Content-Type'] = 'text/plain'
-        self.response.write('Hello, World!')
+import http2push as http2
+
+class MainHandler(http2.PushHandler):
+
+  @http2.push('build/default/push_manifest.json')
+  def get(self):
+    path = os.path.join(os.path.dirname(__file__), 'build/default/index.html')
+    return self.response.write(template.render(path, {}))
 
 
 app = webapp2.WSGIApplication([
-    ('/', MainPage),
+    ('/', MainHandler),
+    ('/view1', MainHandler),
+    ('/view2', MainHandler),
+    ('/view3', MainHandler),
 ], debug=True)

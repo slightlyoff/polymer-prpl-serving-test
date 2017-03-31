@@ -22,6 +22,7 @@ import webapp2
 
 
 PUSH_MANIFEST = 'push_manifest.json'
+DEFAULT_PATH = 'index.html'
 
 manifest_cache = {} # filename -> list of push URL mapping.
 
@@ -121,9 +122,10 @@ class PushHandler(webapp2.RequestHandler):
     preload_links = []
     for url,v in urls.iteritems():
       # Construct absolute URLs. Not really needed, but spec only contains full URLs.
-      url = '%s%s' % (host, str(url))
+      url = '%s/%s' % (host, str(url))
       t = str(v.get('type', ''))
-      if len(t):
+
+      if len(t) and not t == 'document':
         preload_links.append('<%s>; rel=preload; as=%s' % (url, t))
       else:
         preload_links.append('<%s>; rel=preload' % url)
@@ -144,17 +146,43 @@ Example:
  def get(self):
    pass
 
+ @http2push.push('push_manifest.json', 'shell.html') # Override default path
+ def get(self):
+   pass
+
 ?nopush on the URL prevents the header from being included.
 """
-def push(manifest=PUSH_MANIFEST):
+def push(manifest=PUSH_MANIFEST, default=DEFAULT_PATH):
   def decorator(handler):
     push_urls = use_push_manifest(manifest)
+    is_single_file_manifest = False
+    # Check to see if it's a multi-file manifest
+    first_entry = push_urls[push_urls.keys()[0]]
+    if first_entry.has_key('type') and first_entry.has_key('weight'):
+      is_single_file_manifest = True
 
     def wrapper(*args, **kwargs):
       instance = args[0]
       # nopush URL param prevents the Link header from being included.
       if instance.request.get('nopush', None) is None and push_urls:
-        preload_headers = instance._generate_link_preload_headers(push_urls)
+
+        request_push_urls = push_urls;
+        if not is_single_file_manifest:
+          path = instance.request.path
+          if path.startswith('/'):
+            path = path[1:]
+
+          if not push_urls.has_key(path):
+            path = default
+
+          # Bail out if we don't have an entry for the path
+          if not push_urls.has_key(path):
+            return handler(*args, **kwargs)
+
+          request_push_urls = push_urls[path]
+          logging.info(request_push_urls)
+
+        preload_headers = instance._generate_link_preload_headers(request_push_urls)
         if type(preload_headers) is list:
           for h in preload_headers:
             instance.response.headers.add_header('Link', h)
