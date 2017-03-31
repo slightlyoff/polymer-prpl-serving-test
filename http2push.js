@@ -118,24 +118,26 @@ module.exports = function(options) {
   // TODO(slightlyoff): determine if we're in GAE or behind GFE and only serve
   //                    XAC values there.
   let linkValueCache = new Map();
-  let xacValueCache = new Map();
+  // let xacValueCache = new Map();
   let setPreloadValueFromData = function(res, path, data) {
     if (linkValueCache.has(path)) {
       res.set("Link", linkValueCache.get(path));
-      res.set("X-Associated-Content", xacValueCache.get(path));
+      // res.set("X-Associated-Content", xacValueCache.get(path));
       return;
     }
     const linkValue = getLinkHeaderValue(path, data);
-    const xacValue = getXACHeaderValue(path, data);
+    // const xacValue = getXACHeaderValue(path, data);
+    /*
     log("path:", path);
     log("Link header value:", linkValue);
     log("X-Associated-Content value:", linkValue);
+    */
 
     // TODO(slightlyoff): cap total size
     linkValueCache.set(path, linkValue);
-    xacValueCache.set(path, xacValue);
+    // xacValueCache.set(path, xacValue);
     res.set("Link", linkValue);
-    res.set("X-Associated-Content", xacValue);
+    // res.set("X-Associated-Content", xacValue);
   };
 
   // TODO(slightlyoff): only cache a single string if we have a single-file
