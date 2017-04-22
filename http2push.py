@@ -129,6 +129,7 @@ class PushHandler(webapp2.RequestHandler):
         preload_links.append('<%s>; rel=preload; as=%s' % (url, t))
       else:
         preload_links.append('<%s>; rel=preload' % url)
+      # preload_links.append('<%s>; rel=preload; as=%s' % (url, t))
 
     headers = list(set(preload_links)) # remove duplicates
 
@@ -177,19 +178,23 @@ def push(manifest=PUSH_MANIFEST):
 
           request_push_urls = push_urls[path]
 
-        preload_headers = instance._generate_link_preload_headers(request_push_urls)
-        if type(preload_headers) is list:
-          for h in preload_headers:
-            instance.response.headers.add_header('Link', h)
-        else:
-          instance.response.headers.add_header('Link', preload_headers)
+        header = instance._generate_link_preload_headers(request_push_urls)
+        instance.response.headers.add_header('Link', header)
+        logging.info('Link: ' + header)
 
-        xac_headers = instance._generate_associate_content_header(request_push_urls)
-        if type(xac_headers) is list:
-          for h in xac_headers:
-            instance.response.headers.add_header('X-Associated-Content', h)
-        else:
-          instance.response.headers.add_header('X-Associated-Content', xac_headers)
+        # preload_headers = instance._generate_link_preload_headers(request_push_urls)
+        # if type(preload_headers) is list:
+        #   for h in preload_headers:
+        #     instance.response.headers.add_header('Link', h)
+        # else:
+        #   instance.response.headers.add_header('Link', preload_headers)
+
+        # xac_headers = instance._generate_associate_content_header(request_push_urls)
+        # if type(xac_headers) is list:
+        #   for h in xac_headers:
+        #     instance.response.headers.add_header('X-Associated-Content', h)
+        # else:
+        #   instance.response.headers.add_header('X-Associated-Content', xac_headers)
 
       return handler(*args, **kwargs)
 
