@@ -23,6 +23,8 @@ import webapp2
 
 PUSH_MANIFEST = 'push_manifest.json'
 DEFAULT_PATH = 'index.html'
+HEADER_LENGTH_LIMIT = 8 * 1024 # 6K which appears to be the GAE length limit
+                               # Tried 9, 10, and 12K, all of which failed
 
 manifest_cache = {} # filename -> list of push URL mapping.
 
@@ -54,51 +56,6 @@ class PushHandler(webapp2.RequestHandler):
   # def __init__(self, request, response):
    # self.initialize(request, response)
 
-  def _generate_associate_content_header(self, urls=None):
-    """Constructs a value for the X-Associated-Content header.
-
-    Deprecated. Use _generate_link_preload_headers instead.
-
-    The format of the header value is a comma-separated list of double-quoted
-    URLs, each of which may optionally be followed by a colon and a SPDY
-    priority number (from 0 to 7 inclusive). URL needs to be a full absolute
-    URL. Whitespace between tokens is optional, and is ignored if present.
-
-    For example:
-
-      X-Associated-Content: "https://www.example.com/styles/foo.css",
-          "/scripts/bar.js?q=4":2, "https://www.example.com/images/baz.png": 5,
-           "https://www.example.com/generate_image.php?w=32&h=24"
-
-    App Engine supports this header for now. Link: rel=preload is the standard
-    and you should use that to be compliant with the HTTP2 spec.
-
-    Args:
-        url: A dict of url: priority mappings to use in the header.
-
-    Returns:
-        Comma separated string for the X-Associated-Content header.
-    """
-
-    if urls is None:
-      urls = self.push_urls
-
-    host = self.request.host_url
-
-    associate_content = []
-    for url,v in urls.iteritems():
-      url = '%s%s' % (host, str(url)) # Construct absolute URLs.
-
-      weight = v.get('weight', None)
-      if weight is None:
-        associate_content.append('"%s"' % url)
-      else:
-        associate_content.append('"%s":%s' % (url, weight))
-
-    headers = list(set(associate_content)) # remove duplicates
-
-    return ', '.join(headers)
-
   def _generate_link_preload_headers(self, urls=None):
     """Constructs a value for the Link: rel=preload header.
 
@@ -121,10 +78,12 @@ class PushHandler(webapp2.RequestHandler):
 
     preload_links = []
     for url,v in urls.iteritems():
-      # Construct absolute URLs. Not really needed, but spec only contains full URLs.
+      # Construct absolute URLs. Not really needed, but spec only contains full
+      # URLs.
       url = '%s/%s' % (host, str(url))
       t = str(v.get('type', ''))
 
+      tmp_value = ''
       if len(t) and not t == 'document':
         preload_links.append('<%s>; rel=preload; as=%s' % (url, t))
       else:
@@ -133,8 +92,18 @@ class PushHandler(webapp2.RequestHandler):
 
     headers = list(set(preload_links)) # remove duplicates
 
+    # Join the headers up to the limit
+    final_headers = []
+    total_len = 0
+    for link in headers:
+      total_len += len(link) + 4
+      if total_len <= HEADER_LENGTH_LIMIT:
+        final_headers.append(link)
+      else:
+        break
+
     # GAE supports single Link header.
-    return ', '.join(headers)
+    return ', '.join(final_headers)
 
 """
 Example:
@@ -180,21 +149,7 @@ def push(manifest=PUSH_MANIFEST):
 
         header = instance._generate_link_preload_headers(request_push_urls)
         instance.response.headers.add_header('Link', header)
-        logging.info('Link: ' + header)
-
-        # preload_headers = instance._generate_link_preload_headers(request_push_urls)
-        # if type(preload_headers) is list:
-        #   for h in preload_headers:
-        #     instance.response.headers.add_header('Link', h)
-        # else:
-        #   instance.response.headers.add_header('Link', preload_headers)
-
-        # xac_headers = instance._generate_associate_content_header(request_push_urls)
-        # if type(xac_headers) is list:
-        #   for h in xac_headers:
-        #     instance.response.headers.add_header('X-Associated-Content', h)
-        # else:
-        #   instance.response.headers.add_header('X-Associated-Content', xac_headers)
+        # logging.info('Link: ' + header)
 
       return handler(*args, **kwargs)
 
